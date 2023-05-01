@@ -32,14 +32,20 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+   const userCollection = client.db('simpleNode').collection('users');
+   const user = {name: 'Nayon', email: 'nayon@gmail.com'}
+//    const result = await userCollection.insertOne(user)
+//    console.log(result)
+app.post("/users", async (req, res) => {
+    console.log("POST API called");
+    const user = req.body;
+    const result = await userCollection.insertOne(user)
+    console.log(result)
+    user.id=result.insertedId
+    res.send(user);
+  });
   } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    
   }
 }
 run().catch(console.dir);
@@ -57,14 +63,14 @@ app.get("/users", (req, res) => {
   }
 });
 
-app.post("/users", (req, res) => {
-  console.log("POST API called");
-  const user = req.body;
-  user.id = users.length + 1;
-  users.push(user);
-  console.log(user);
-  res.send(user);
-});
+// app.post("/users", (req, res) => {
+//   console.log("POST API called");
+//   const user = req.body;
+//   user.id = users.length + 1;
+//   users.push(user);
+//   console.log(user);
+//   res.send(user);
+// });
 
 app.listen(port, () => {
   console.log(`Simple node server is running on port ${port}`);
